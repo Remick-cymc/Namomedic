@@ -80,7 +80,98 @@ class memberprofile(Resource):
         if cursor.rowcount == 0:
             return jsonify({"message":"user does not exist"})
         else:
-            return jsonify({"message":"member found"})
-           
+            member = cursor.fetchone()
+            return jsonify(member)
+        
+class AddDependants(Resource):
+    def post(self):
+        data = request.json
+        member_id = data["member_id"]
+        surname = data["surname"]
+        others = data["others"]
+        dob = data["dob"]
+        # connection to db
+        connection = pymysql.connect(host='localhost',user='root',password='',database='mediic')
+        cursor = connection.cursor()
+        sql = "select * from members where member_id = %s"
+        cursor.execute(sql, member_id)
+        if cursor.rowcount == 0:
+            return jsonify({"message":"member does not exist"})
+        else:
+            # member exist, now you can add the dependant
+            # insert the data
+            sql1 = "insert into dependants(member_id, surname, others, dob) values(%s, %s, %s, %s)"
+            data = (member_id, surname, others, dob)
+
+            try:
+                cursor.execute(sql1, data)
+                connection.commit()
+                return jsonify({ "message":"Dependant added successful" })
+            except:
+                connection.rollback()
+                return jsonify( {"message":"failed to add dependant"} )
+# view dependants
+class ViewDependants(Resource):
+    def post(self):
+        data = request.json
+        member_id = data["member_id"]
+
+        connection = pymysql.connect(host='localhost',user='root',password='',database='mediic')
+        cursor = connection.cursor(  pymysql.cursors.DictCursor)
+        sql = "select * from dependants where member_id = %s"
+        cursor.execute(sql,member_id)
+        if cursor.rowcount == 0:
+            return jsonify({"message":"member does not exist"})
+        else:
+            dependants = cursor.fetchall()
+            return jsonify(dependants)
+
+# view lab test
+class ViewLabTests(Resource):
+    def get(self):
+        connection = pymysql.connect(host='localhost',user='root',password='',database='mediic')
+        cursor = connection.cursor(  pymysql.cursors.DictCursor)
+        sql = "select * from labtests"
+        cursor.execute(sql)
+        if cursor.rowcount == 0:
+            return jsonify({"message":"no lab test found"})
+        else:
+            labtests = cursor.fetchall()
+            return jsonify(labtests)
+
+# bookings
+class Bookings(Resource):
+    def post(self):
+        data = request.json
+        member_id = data ["member_id"]
+        booked_for = data["booked_for"]
+        dependant_id = data["dependant_id"]
+        test_id = data["test_id"]
+        appointment_date = data["appointment_date"]
+        appointment_time = data["appointment_time"]
+        where_taken = data["where_taken"]
+        latitude = data["latitude"]
+        longitude = data["longitude"]
+        status = data["status"]
+        invoice_no = data["invoice_no"]
+
+        connection = pymysql.connect(host='localhost',user='root',password='',database='mediic')
+        cursor = connection.cursor()
+        
+        sql = "insert into bookings (member_id,booked_for, dependant_id, test_id, appointment_date,appointment_time,where_taken,latitude,longitude,status,invoice_no) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+        data = (member_id,booked_for,dependant_id,test_id,appointment_date,appointment_time,where_taken,latitude,longitude,status,invoice_no)
+
+        try:
+
+
+            cursor.execute(sql, data)
+            connection.commit()
+            return jsonify({"message":"booked successful"})
+        
+        except:
+            connection.rollback()
+            return jsonify({"message":"booked failed"})
+
+        
 
             
