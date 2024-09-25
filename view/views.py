@@ -174,4 +174,31 @@ class Bookings(Resource):
 
         
 
-            
+class ViewBooking(Resource):
+    def post(self):
+        data = request.json
+        member_id = data ["member_id"]
+
+        connection = pymysql.connect(host='localhost',user='root',password='',database='mediic')
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+
+        sql = "select * FROM bookings WHERE member_id = %s"
+        cursor.execute(sql, member_id)
+        
+        if cursor.rowcount == 0:
+            return jsonify({"no booking found"})
+        else:
+            Bookings = cursor.fetchall()
+            import json
+            jsonstr = json.dumps(Bookings, indent=1, sort_keys= True, default=str)
+            return json.loads(jsonstr)
+
+# make payment
+class MakePayment(Resource):
+    def post(self):
+        data = request.json
+        phone = data["phone"]
+        amount = data["amount"]
+        invoice_no = data["invoice_no"]
+        
+

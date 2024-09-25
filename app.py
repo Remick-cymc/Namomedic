@@ -7,7 +7,7 @@ app = Flask(__name__)
 # make the app an api
 api = Api(app)
 
-from view.views import MemberSignup,MembersSignin,memberprofile, AddDependants,ViewDependants,ViewLabTests,Bookings
+from view.views import MemberSignup,MembersSignin,memberprofile, AddDependants,ViewDependants,ViewLabTests,Bookings,ViewBooking
 
 api.add_resource(MemberSignup, "/api/member_signup")
 api.add_resource(MembersSignin, "/api/member_signin")
@@ -16,6 +16,7 @@ api.add_resource(AddDependants,"/api/add_dependants")
 api.add_resource(ViewDependants,"/api/view_dependants")
 api.add_resource(ViewLabTests,"/api/viewlab_test")
 api.add_resource(Bookings,"/api/bookings")
+api.add_resource(ViewBooking,"/api/viewbookings")
 
 
 if __name__ =='__main__':
